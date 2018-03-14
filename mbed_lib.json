@@ -1,0 +1,10 @@
+{
+    "name": "MQTT",
+    "config": {
+        "mqtt-interface":{
+            "help": "Options are MQTT_ETHERNET, MQTT_WNC14A2A, MQTT_BG96",
+            "value": "MQTT_ETHERNET"
+       }
+    }
+}
+
