@@ -24,7 +24,6 @@
 #if !defined(MQTTCLIENT_H)
 #define MQTTCLIENT_H
 
-#include "FP.h"
 #include "MQTTPacket.h"
 #include <stdio.h>
 #include "MQTTLogging.h"
@@ -129,9 +128,9 @@ public:
     void setDefaultMessageHandler(messageHandler mh)
     {
         if (mh != 0)
-            defaultMessageHandler.attach(mh);
+            defaultMessageHandler=mh;
         else
-            defaultMessageHandler.detach();
+            defaultMessageHandler=NULL;
     }
 
     /** Set a message handling callback.  This can be used outside of the the subscribe method.
@@ -265,10 +264,10 @@ private:
     struct MessageHandlers
     {
         const char* topicFilter;
-        FP<void, MessageData&> fp;
+        Callback<void( MessageData&)> fp;
     } messageHandlers[MAX_MESSAGE_HANDLERS];      // Message handlers are indexed by subscription topic
 
-    FP<void, MessageData&> defaultMessageHandler;
+    Callback<void(MessageData&)> defaultMessageHandler;
 
     bool isconnected;
 
@@ -534,7 +533,7 @@ int MQTT::Client<Network, Timer, a, MAX_MESSAGE_HANDLERS>::deliverMessage(MQTTSt
         if (messageHandlers[i].topicFilter != 0 && (MQTTPacket_equals(&topicName, (char*)messageHandlers[i].topicFilter) ||
                 isTopicMatched((char*)messageHandlers[i].topicFilter, topicName)))
         {
-            if (messageHandlers[i].fp.attached())
+            if (messageHandlers[i].fp)  //test to see if it is attached
             {
                 MessageData md(topicName, message);
                 messageHandlers[i].fp(md);
@@ -543,7 +542,7 @@ int MQTT::Client<Network, Timer, a, MAX_MESSAGE_HANDLERS>::deliverMessage(MQTTSt
         }
     }
 
-    if (rc == FAILURE && defaultMessageHandler.attached())
+    if (rc == FAILURE && defaultMessageHandler )
     {
         MessageData md(topicName, message);
         defaultMessageHandler(md);
