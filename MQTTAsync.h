@@ -17,7 +17,6 @@
 #if !defined(MQTTASYNC_H)
 #define MQTTASYNC_H
 
-#include "FP.h"
 #include "MQTTPacket.h"
 #include "stdio.h"
 
@@ -156,10 +155,10 @@ private:
     
     PacketId packetid;
     
-    typedef FP<void, Result*> resultHandlerFP;    
+    typedef Callback<void(Result*)> resultHandlerFP;    
     resultHandlerFP connectHandler; 
     
-    typedef FP<void, Message*> messageHandlerFP;
+    typedef Callback<void(Message*)> messageHandlerFP;
     struct MessageHandlers
     {
     	const char* topic;
@@ -180,7 +179,7 @@ private:
 	
 	messageHandlerFP defaultMessageHandler;
     
-    typedef FP<int, connectionLostInfo*> connectionLostFP;
+    typedef Callback<int(connectionLostInfo*)> connectionLostFP;
     
     connectionLostFP connectionLostHandler;
     
